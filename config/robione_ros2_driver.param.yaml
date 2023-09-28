@@ -1,0 +1,21 @@
+/**:
+  ros__parameters:
+
+    topic_config:
+      control_cmd_topic: "/robione/control_cmd"
+      joystick_topic: "/joy"
+
+    serial_config:
+      port: "/dev/ttyUSB0"
+      baudrate: 115200
+
+    commpro_config:
+      interface_id: 1
+      vcu_id: 0
+
+    timeout_config:
+      control_cmd_timeout: 0.5 # [s]
+      joystick_timeout: 5.0 # [s]
+    robione_config:
+      set_steer_rate: true
+      use_joystick: false
