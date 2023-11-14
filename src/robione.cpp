@@ -7,6 +7,7 @@ namespace robione{
         load_params();
         create_subs();
         create_pubs();
+        create_services();
         try_serial_connection();
 
 
@@ -15,7 +16,7 @@ namespace robione{
 
 
         RCLCPP_INFO(this->get_logger(), "Robione interface is initialized successfully.");
-        timer_ = this->create_wall_timer(std::chrono::milliseconds(10), std::bind(&RobioneInterface::timer_callback, this));
+        timer_ = this->create_wall_timer(std::chrono::milliseconds(20), std::bind(&RobioneInterface::timer_callback, this));
     }
 
     void RobioneInterface::timer_callback() {
@@ -100,7 +101,9 @@ namespace robione{
     }
 
     void RobioneInterface::commpro_callback(const comm_pro *comm_pro) {
+        rclcpp::Clock clock{ RCL_ROS_TIME };
         auto solved_comm = comm_pro->get_solved_comm_pro();
+        RCLCPP_WARN_THROTTLE(this->get_logger(), clock, 1000, "Received msg : %d", solved_comm.msgCounter);
         switch(solved_comm.msgId){
             case serial_interface::MessageID::LLC_MSG_ID:{
                 serial_interface::LlcToComp llc_to_comp{};
@@ -120,6 +123,16 @@ namespace robione{
                 pub_vehicle_info_->publish(SerialConverter::convert_debug_to_vehicle_info(debug_slow));
                 break;
             }
+            case serial_interface::MessageID::SET_STEERING_ALIGN_MSG_ID:{
+                if(solved_comm.msg[0]){
+                    RCLCPP_INFO(this->get_logger(), "Steering align is set successfully.");
+                }
+                else{
+                    RCLCPP_ERROR(this->get_logger(), "Steering align is not set.");
+                }
+
+
+            }
         }
     }
 
@@ -138,6 +151,12 @@ namespace robione{
         pub_vehicle_status_ = this->create_publisher<robione_ros2_driver::msg::VehicleStatus>("/robione/vehicle_status", 10);
         pub_vehicle_info_ = this->create_publisher<robione_ros2_driver::msg::VehicleInfo>("/robione/vehicle_info", 10);
         pub_system_status_ = this->create_publisher<robione_ros2_driver::msg::SystemStatus>("/robione/system_status", 10);
+    }
+
+
+
+    void RobioneInterface::create_services(){
+        srv_set_steering_align_ = this->create_service<std_srvs::srv::Empty>("/robione/set_steering_align",std::bind(&RobioneInterface::set_steering_align_callback, this, std::placeholders::_1, std::placeholders::_2));
     }
 
     void RobioneInterface::control_cmd_callback(const robione_ros2_driver::msg::ControlCmd::SharedPtr msg) {
@@ -215,6 +234,15 @@ namespace robione{
             RCLCPP_WARN_THROTTLE(this->get_logger(), clock, 1000, "\033[1;33mEmergency value is out of range.\033[0m");
         }
         return state;
+    }
+
+    void RobioneInterface::set_steering_align_callback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+                                                       std::shared_ptr<std_srvs::srv::Empty::Response> response){
+
+        RCLCPP_INFO(this->get_logger(), "Set steering align service is called.");
+        comm_pro_.fill_comm_pro(serial_interface::MessageID::SET_STEERING_ALIGN_MSG_ID, params_.commpro.vcu_id, nullptr, 0);
+        serial_.write(comm_pro_.get_raw_comm_pro());
+
     }
 
 

@@ -23,6 +23,8 @@ namespace robione{
          }
          comp_to_llc.vehicle_cmd.gear = msg->gear;
          comp_to_llc.vehicle_cmd.handbrake = msg->handbrake;
+         comp_to_llc.vehicle_cmd.blinkers = msg->blinkers;
+         comp_to_llc.vehicle_cmd.head_light = msg->head_light;
          comp_to_llc.emergency_cmd = msg->emergency;
          return comp_to_llc;
      }
@@ -77,6 +79,8 @@ namespace robione{
         vehicle_status.handbrake = llc_to_comp.vehicle_info.handbrake;
         vehicle_status.gear = llc_to_comp.vehicle_info.gear;
         vehicle_status.mode = llc_to_comp.vehicle_info.mode;
+        vehicle_status.head_light = llc_to_comp.vehicle_info.head_light;
+        vehicle_status.blinkers = llc_to_comp.vehicle_info.blinkers;
 
         vehicle_status.intervention = llc_to_comp.state_info.intervention;
         vehicle_status.ready = llc_to_comp.state_info.ready;
@@ -95,6 +99,7 @@ namespace robione{
         vehicle_info.brake_encoder_period = debug_slow.periods.brakeEncoderPeriod;
         vehicle_info.rf_controller_period = debug_slow.periods.rfControllerPeriod;
         vehicle_info.steer_controller_period = debug_slow.periods.steerControllerPeriod;
+        vehicle_info.bat_controller_period = debug_slow.periods.batControllerPeriod;
         vehicle_info.bms_period = debug_slow.periods.bmsPeriod;
         vehicle_info.charge_status = debug_slow.charge_status;
         vehicle_info.soc = debug_slow.SoC;

@@ -9,12 +9,10 @@ namespace serial_interface {
 
     enum MessageID:uint8_t {
         LLC_MSG_ID = 0x36U,
-        COMP_TO_LLC_MSG_ID = 0x31U,
-        COMP_TO_SRV_MSG_ID = 0x52U,
-        LLC_TO_SRV_MSG_ID  = 0x53U,
-        SRV_TO_LLC_MSG_ID  = 0x77U,
+        COMP_TO_LLC_MSG_ID = 0x87U,
         DEBUG_MSG_FAST_ID  = 0x88U,
         DEBUG_MSG_SLOW_ID  =  0x89U,
+        SET_STEERING_ALIGN_MSG_ID = 0x90U,
     };
 
     struct __attribute__((packed)) LongitudinalCmd {
@@ -31,6 +29,7 @@ namespace serial_interface {
         uint8_t gear;
         uint8_t handbrake;
         uint8_t blinkers;
+        uint8_t head_light;
         uint8_t mode;
     };
 
@@ -45,7 +44,7 @@ namespace serial_interface {
         uint8_t mode;
         uint8_t handbrake;
         uint8_t head_light;
-        uint8_t turn_indicators;
+        uint8_t blinkers;
     };
 
     struct __attribute__((packed)) StateInfo {
@@ -80,35 +79,6 @@ namespace serial_interface {
         StateInfo state_info;
         uint8_t emergency;
     };
-
-    struct __attribute__((packed)) LogData {
-        uint32_t system_time;
-        uint16_t bat_volt;
-        uint16_t applied_dac;
-        uint8_t joystick_ref_angle;
-        int16_t vcu_steer_ref_angle;
-        int16_t current;
-        uint8_t soc;
-        uint8_t set_throttle;
-        uint16_t act_rpm;
-        int16_t steering_act_angle;
-        int16_t steering_ref_angle;
-        uint16_t steering_current;
-        uint8_t mode;
-        uint16_t min_cell_voltage;
-        int16_t acceleration;
-    };
-
-    struct __attribute__((packed)) SrvToComp {
-        float steering; // -1 - 1 right-axis
-        float throttle; // -1 - 1 left-axis
-        uint8_t handbrake; //0:Applied 1:Released
-        uint8_t direction; //0:Forward 1:Backward
-        uint8_t emergency; //0 :Normal, 1:emergency
-        uint8_t autoware_control_mode; // 1:Enable 4:Disable
-        uint8_t operation_mode; // 1:Stop 2:Autonomous 3:Local 4:Remote
-    };
-
     struct __attribute__((packed)) Currents_t {
         float sysCurrent;
         float brakeLeftCurrent;
@@ -119,32 +89,6 @@ namespace serial_interface {
         float supplyVoltage;
     };
 
-    union __attribute__((packed)) BrakeParams{
-        uint8_t raw[8];
-        struct __attribute__((packed)) {
-            uint16_t state_b1                              : 3;
-            uint16_t state_b2                              : 3;
-            uint16_t mode_b1                               : 2;
-            uint16_t mode_b2                               : 2;
-            uint16_t calib_status_b1                       : 1;
-            uint16_t calib_status_b2                       : 1;
-            uint16_t reserved                              : 4;
-        }bits;
-        uint16_t all;
-    };
-
-    struct __attribute__((packed)) BrakeMsg_t {
-        int16_t angle1;
-        int16_t angle2;
-        int16_t averageAngle;
-        uint16_t params;
-        float current1;
-        float current2;
-        int32_t encoderVal1;
-        int32_t encoderVal2;
-    };
-
-
     struct __attribute__((packed)) SysCommPeriods_t {
         float comp_period;
         float brakeStatusPeriod;
@@ -152,6 +96,7 @@ namespace serial_interface {
         float rfControllerPeriod;
         float steerControllerPeriod;
         float bmsPeriod;
+        float batControllerPeriod;
     };
 
     struct __attribute__((packed)) DebugMsgFast_t {

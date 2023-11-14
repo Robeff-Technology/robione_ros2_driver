@@ -9,6 +9,7 @@
 
 #include "sensor_msgs/msg/joy.hpp"
 #include "robione_ros2_driver/serial_interface.h"
+#include "std_srvs/srv/empty.hpp"
 
 namespace robione{
     class RobioneInterface : public rclcpp::Node{
@@ -53,19 +54,22 @@ namespace robione{
         * Vcu communication timer
         */
         rclcpp::TimerBase::SharedPtr timer_;
+        rclcpp::Time joy_time_;
+        rclcpp::Time control_cmd_time_;
+
         void timer_callback();
         /*
          *Subscribers
          */
         robione_ros2_driver::msg::ControlCmd::ConstSharedPtr control_cmd_ptr_;
         rclcpp::Subscription<robione_ros2_driver::msg::ControlCmd>::SharedPtr sub_control_cmd_;
-        void control_cmd_callback(const robione_ros2_driver::msg::ControlCmd::SharedPtr msg);
-        rclcpp::Time control_cmd_time_;
 
+        void control_cmd_callback(const robione_ros2_driver::msg::ControlCmd::SharedPtr msg);
         sensor_msgs::msg::Joy::ConstSharedPtr joy_ptr_;
         rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr sub_joy_;
         void joy_callback(const sensor_msgs::msg::Joy::SharedPtr msg);
-        rclcpp::Time joy_time_;
+
+        void create_subs();
 
 
         /*
@@ -75,6 +79,16 @@ namespace robione{
         rclcpp::Publisher<robione_ros2_driver::msg::VehicleInfo>::SharedPtr pub_vehicle_info_;
         rclcpp::Publisher<robione_ros2_driver::msg::SystemStatus>::SharedPtr pub_system_status_;
 
+        void create_pubs();
+
+        /*
+         * SERVICES
+         */
+        rclcpp::Service<std_srvs::srv::Empty>::SharedPtr srv_set_steering_align_;
+        void set_steering_align_callback(const std::shared_ptr<std_srvs::srv::Empty::Request> request,
+                                         std::shared_ptr<std_srvs::srv::Empty::Response> response);
+
+        void create_services();
     public:
         RobioneInterface();
         ~RobioneInterface() override{
@@ -88,13 +102,12 @@ namespace robione{
 
         void commpro_callback(const comm_pro *comm_pro);
 
-        void create_subs();
-
-
         bool check_timeout();
 
         bool check_control_cmd(const robione_ros2_driver::msg::ControlCmd::ConstSharedPtr control_cmd_ptr);
 
-        void create_pubs();
+
+
+
     };
 }

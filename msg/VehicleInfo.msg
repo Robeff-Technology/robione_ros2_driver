@@ -9,6 +9,7 @@ float32 brake_encoder_period #[Hz]
 float32 rf_controller_period #[Hz]
 float32 steer_controller_period #[Hz]
 float32 bms_period #[Hz]
+float32 bat_controller_period #[Hz]
 
 
 float32 battery_temperature1 # [°C]

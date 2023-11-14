@@ -10,6 +10,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 include_directories(
@@ -34,6 +36,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     ${msg_files}
     DEPENDENCIES
     std_msgs
+    std_srvs
 )
 
 set(LIBRARY_DIR ${CMAKE_SOURCE_DIR}/lib)

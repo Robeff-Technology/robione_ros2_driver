@@ -18,6 +18,18 @@ uint8 GEAR_NEUTRAL=0
 uint8 GEAR_DRIVE=1
 uint8 GEAR_REVERSE=2
 
+uint8 blinkers
+
+uint8 NO_COMMAND = 0
+uint8 LEFT_TURN_SIGNAL=2
+uint8 RIGHT_TURN_SIGNAL=3
+
+
+uint8 head_light
+
+uint8 HEAD_LIGHT_OFF=0
+uint8 HEAD_LIGHT_ON=1
+
 
 uint8 intervention
 
